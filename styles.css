@@ -1,0 +1,208 @@
+/* Coursera Quiz Automation - Content Styles */
+
+/* Answer highlighting */
+.cqa-correct {
+  background: linear-gradient(90deg, rgba(0, 255, 136, 0.15) 0%, rgba(0, 255, 136, 0.05) 100%) !important;
+  border-left: 3px solid #00ff88 !important;
+  padding-left: 12px !important;
+  transition: all 0.3s ease !important;
+}
+
+.cqa-highlight {
+  animation: cqa-pulse 0.5s ease;
+}
+
+@keyframes cqa-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4);
+  }
+  50% {
+    transform: scale(1.01);
+    box-shadow: 0 0 0 8px rgba(0, 255, 136, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
+  }
+}
+
+/* Confidence badge */
+.cqa-badge {
+  position: absolute !important;
+  top: 50% !important;
+  right: 12px !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  z-index: 1000 !important;
+}
+
+.cqa-confidence {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 4px 10px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  cursor: help !important;
+  transition: all 0.2s ease !important;
+}
+
+.cqa-badge.cqa-high .cqa-confidence {
+  background: rgba(0, 255, 136, 0.2) !important;
+  color: #00cc6a !important;
+  border: 1px solid rgba(0, 255, 136, 0.3) !important;
+}
+
+.cqa-badge.cqa-medium .cqa-confidence {
+  background: rgba(255, 193, 7, 0.2) !important;
+  color: #ffc107 !important;
+  border: 1px solid rgba(255, 193, 7, 0.3) !important;
+}
+
+.cqa-badge.cqa-low .cqa-confidence {
+  background: rgba(255, 68, 68, 0.2) !important;
+  color: #ff6b6b !important;
+  border: 1px solid rgba(255, 68, 68, 0.3) !important;
+}
+
+/* Tooltip for explanation */
+.cqa-tooltip {
+  display: none;
+  position: absolute !important;
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  min-width: 250px !important;
+  max-width: 350px !important;
+  padding: 12px 16px !important;
+  background: #1a1a2e !important;
+  color: #eee !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid #333 !important;
+  z-index: 10001 !important;
+  white-space: normal !important;
+}
+
+.cqa-badge:hover .cqa-tooltip {
+  display: block !important;
+  animation: cqa-fadeIn 0.2s ease !important;
+}
+
+@keyframes cqa-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Notification toast */
+.cqa-notification {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  padding: 14px 24px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  z-index: 999999 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+  animation: cqa-slideIn 0.3s ease !important;
+  max-width: 400px !important;
+}
+
+@keyframes cqa-slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.cqa-notification.cqa-fade-out {
+  animation: cqa-slideOut 0.3s ease forwards !important;
+}
+
+@keyframes cqa-slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.cqa-notification.cqa-info {
+  background: linear-gradient(135deg, #1a1a2e, #16213e) !important;
+  color: #00d4ff !important;
+  border: 1px solid #00d4ff33 !important;
+}
+
+.cqa-notification.cqa-success {
+  background: linear-gradient(135deg, #0a2a1a, #0d3320) !important;
+  color: #00ff88 !important;
+  border: 1px solid #00ff8833 !important;
+}
+
+.cqa-notification.cqa-error {
+  background: linear-gradient(135deg, #2a0a0a, #331010) !important;
+  color: #ff6b6b !important;
+  border: 1px solid #ff6b6b33 !important;
+}
+
+/* Processing indicator */
+.cqa-processing {
+  position: relative !important;
+}
+
+.cqa-processing::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 50% !important;
+  right: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  border: 2px solid #00d4ff33 !important;
+  border-top-color: #00d4ff !important;
+  border-radius: 50% !important;
+  animation: cqa-spin 0.8s linear infinite !important;
+}
+
+@keyframes cqa-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Dark mode compatibility */
+@media (prefers-color-scheme: dark) {
+  .cqa-tooltip {
+    background: #1a1a2e !important;
+    color: #eee !important;
+    border-color: #333 !important;
+  }
+}
+
+/* Ensure our styles don't break Coursera's layout */
+.cqa-correct,
+.cqa-highlight {
+  position: relative !important;
+  display: block !important;
+}

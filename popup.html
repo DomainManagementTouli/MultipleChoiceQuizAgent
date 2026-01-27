@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Coursera Quiz Automation</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 360px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      padding: 16px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #333;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      color: #00d4ff;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      font-size: 11px;
+      color: #888;
+    }
+
+    .section {
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #00d4ff;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 4px;
+    }
+
+    select, input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #333;
+      border-radius: 6px;
+      background: #16213e;
+      color: #fff;
+      font-size: 13px;
+      margin-bottom: 10px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    select:focus, input:focus {
+      border-color: #00d4ff;
+    }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #333;
+    }
+
+    .toggle-label {
+      font-size: 13px;
+      color: #ddd;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #333;
+      transition: 0.3s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #fff;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #00d4ff;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00d4ff, #0066ff);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+    }
+
+    .btn-secondary {
+      background: #333;
+      color: #fff;
+    }
+
+    .btn-secondary:hover {
+      background: #444;
+    }
+
+    .status {
+      text-align: center;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .status.success {
+      display: block;
+      background: rgba(0, 255, 136, 0.15);
+      color: #00ff88;
+      border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+
+    .status.error {
+      display: block;
+      background: rgba(255, 68, 68, 0.15);
+      color: #ff4444;
+      border: 1px solid rgba(255, 68, 68, 0.3);
+    }
+
+    .shortcuts {
+      background: #16213e;
+      border-radius: 6px;
+      padding: 10px;
+      margin-top: 12px;
+    }
+
+    .shortcut-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 4px 0;
+    }
+
+    .shortcut-key {
+      background: #333;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #00d4ff;
+    }
+
+    .model-select {
+      margin-bottom: 10px;
+    }
+
+    .api-key-container {
+      position: relative;
+    }
+
+    .toggle-visibility {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 4px;
+    }
+
+    .toggle-visibility:hover {
+      color: #00d4ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Coursera Quiz Automation</h1>
+    <p>AI-Powered Quiz Solver</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">AI Provider</div>
+    <select id="aiProvider" class="model-select">
+      <option value="openai">OpenAI (GPT-4)</option>
+      <option value="gemini">Google Gemini</option>
+    </select>
+
+    <div id="openaiConfig">
+      <label for="openaiKey">OpenAI API Key</label>
+      <div class="api-key-container">
+        <input type="password" id="openaiKey" placeholder="sk-...">
+        <button class="toggle-visibility" data-target="openaiKey">Show</button>
+      </div>
+      <label for="openaiModel">Model</label>
+      <select id="openaiModel">
+        <option value="gpt-4o">GPT-4o (Recommended)</option>
+        <option value="gpt-4o-mini">GPT-4o Mini (Faster)</option>
+        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+        <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Cheapest)</option>
+      </select>
+    </div>
+
+    <div id="geminiConfig" style="display: none;">
+      <label for="geminiKey">Google Gemini API Key</label>
+      <div class="api-key-container">
+        <input type="password" id="geminiKey" placeholder="AIza...">
+        <button class="toggle-visibility" data-target="geminiKey">Show</button>
+      </div>
+      <label for="geminiModel">Model</label>
+      <select id="geminiModel">
+        <option value="gemini-1.5-pro">Gemini 1.5 Pro (Recommended)</option>
+        <option value="gemini-1.5-flash">Gemini 1.5 Flash (Faster)</option>
+        <option value="gemini-pro">Gemini Pro</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Settings</div>
+
+    <div class="toggle-container">
+      <span class="toggle-label">Auto-solve on page load</span>
+      <label class="toggle">
+        <input type="checkbox" id="autoSolve">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-container">
+      <span class="toggle-label">Auto-select answers</span>
+      <label class="toggle">
+        <input type="checkbox" id="autoSelect" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-container">
+      <span class="toggle-label">Show confidence scores</span>
+      <label class="toggle">
+        <input type="checkbox" id="showConfidence" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-container">
+      <span class="toggle-label">Highlight answers</span>
+      <label class="toggle">
+        <input type="checkbox" id="highlightAnswers" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="section">
+    <button id="saveBtn" class="btn btn-primary">Save Settings</button>
+    <button id="solveBtn" class="btn btn-secondary">Solve Current Quiz</button>
+    <div id="status" class="status"></div>
+  </div>
+
+  <div class="shortcuts">
+    <div class="section-title">Keyboard Shortcuts</div>
+    <div class="shortcut-item">
+      <span>Solve Quiz</span>
+      <span class="shortcut-key">Alt + Z</span>
+    </div>
+    <div class="shortcut-item">
+      <span>Next Question</span>
+      <span class="shortcut-key">Alt + N</span>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
