@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "Coursera Quiz Automation",
-  "version": "1.0.0",
-  "description": "Personal Chrome extension to automate Coursera quizzes using AI (OpenAI GPT or Google Gemini)",
+  "name": "Coursera Quiz & Grades Automation",
+  "version": "2.0.0",
+  "description": "Chrome extension to automate Coursera quizzes and complete all graded assignments using AI (OpenAI GPT or Google Gemini)",
   "permissions": [
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "downloads"
   ],
   "host_permissions": [
     "https://www.coursera.org/*",
@@ -32,7 +33,7 @@
   "content_scripts": [
     {
       "matches": ["https://www.coursera.org/*"],
-      "js": ["content.js"],
+      "js": ["content.js", "grades-automation.js"],
       "css": ["styles.css"],
       "run_at": "document_idle"
     }
@@ -49,6 +50,12 @@
         "default": "Alt+N"
       },
       "description": "Go to next question"
+    },
+    "start-automation": {
+      "suggested_key": {
+        "default": "Alt+G"
+      },
+      "description": "Start grades automation"
     }
   }
 }

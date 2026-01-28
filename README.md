@@ -1,15 +1,24 @@
-# Coursera Quiz Automation
+# Coursera Quiz & Grades Automation
 
-A personal Chrome extension to automate Coursera quizzes using AI (OpenAI GPT or Google Gemini).
+A Chrome extension to automate Coursera quizzes and complete all graded assignments using AI (OpenAI GPT or Google Gemini).
 
 ## Features
 
+### Quiz Solver
 - **AI-Powered Answers**: Uses GPT-4 or Gemini to analyze and answer quiz questions
 - **Auto-Select**: Automatically selects the correct answers
 - **Confidence Scores**: Shows AI confidence level for each answer
 - **Visual Highlighting**: Highlights selected answers with color coding
 - **Keyboard Shortcuts**: Quick access with Alt+Z to solve quizzes
 - **Multiple AI Providers**: Supports both OpenAI and Google Gemini
+
+### Grades Automation (NEW!)
+- **Automatic Course Completion**: Navigate through all graded assignments in a course
+- **Quiz Auto-Solve**: Automatically solves all quizzes and exams
+- **Written Assignment Generation**: AI generates responses for written assignments
+- **Auto-Upload**: Automatically uploads generated documents
+- **Specialization Support**: Continues to next course in a specialization
+- **Progress Tracking**: Real-time stats showing completed items
 
 ## Requirements
 
@@ -42,32 +51,69 @@ You need an API key from one of the following providers:
 
 3. **Load the extension**
    - Click "Load unpacked"
-   - Select the `coursera-quiz-automation` folder
+   - Select the extension folder
 
 4. **Configure your API key**
    - Click the extension icon in Chrome toolbar
+   - Go to "Settings" tab
    - Select your AI provider (OpenAI or Gemini)
    - Enter your API key
    - Click "Save Settings"
 
 ## Usage
 
-### Method 1: Popup Button
+### Quiz Solver
+
+#### Method 1: Popup Button
 1. Navigate to a Coursera quiz page
 2. Click the extension icon
 3. Click "Solve Current Quiz"
 
-### Method 2: Keyboard Shortcut
+#### Method 2: Keyboard Shortcut
 1. Navigate to a Coursera quiz page
 2. Press `Alt + Z` to solve the quiz
 3. Press `Alt + N` to go to the next question
 
-### Method 3: Auto-Solve
+#### Method 3: Auto-Solve
 1. Enable "Auto-solve on page load" in settings
 2. Quiz will automatically be solved when you open a quiz page
 
+### Grades Automation
+
+The grades automation feature will automatically complete all graded assignments in a course.
+
+#### How to Use
+1. Navigate to any page within a Coursera course
+2. Click the extension icon
+3. Go to "Grades Auto" tab
+4. Configure options:
+   - **Continue to next course**: Automatically proceed to the next course in a specialization
+   - **Redo completed assignments**: Re-attempt even if already passed
+   - **Auto-submit assignments**: Automatically click submit after completing
+5. Click "Start Grades Automation"
+
+#### What It Does
+1. Navigates to the course's Grades page
+2. Identifies all graded assignments
+3. For each incomplete assignment:
+   - **Quizzes/Exams**: Automatically answers all questions using AI
+   - **Written Assignments**: Generates a response based on instructions, creates a document, and uploads it
+   - **Discussions**: Posts AI-generated responses
+4. After completing all assignments, moves to the next course if enabled
+
+#### Supported Assignment Types
+| Type | Automation Level |
+|------|------------------|
+| Multiple Choice Quizzes | Fully Automated |
+| Exams | Fully Automated |
+| Written Assignments | Fully Automated (generates and uploads) |
+| Discussion Posts | Fully Automated |
+| Peer Reviews | Manual Required |
+| Programming Assignments | Manual Required |
+
 ## Settings
 
+### Quiz Settings
 | Setting | Description |
 |---------|-------------|
 | AI Provider | Choose between OpenAI or Gemini |
@@ -77,11 +123,28 @@ You need an API key from one of the following providers:
 | Show confidence | Display confidence percentage badges |
 | Highlight answers | Visually highlight correct answers |
 
+### Grades Automation Settings
+| Setting | Description |
+|---------|-------------|
+| Continue to next course | Auto-proceed through specialization courses |
+| Redo completed assignments | Retry assignments even if already passed |
+| Auto-submit assignments | Automatically submit after completion |
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| Alt + Z | Solve current quiz |
+| Alt + N | Go to next question |
+| Alt + G | Start grades automation |
+
 ## Supported Question Types
 
 - Multiple choice (single answer)
 - Multiple choice (multiple answers)
 - True/False questions
+- Written response assignments
+- Discussion prompts
 
 ## Accuracy
 
@@ -94,7 +157,7 @@ You need an API key from one of the following providers:
 ## Troubleshooting
 
 ### "API key not configured"
-- Click the extension icon and enter your API key
+- Click the extension icon and enter your API key in Settings tab
 
 ### "No questions found"
 - Make sure you're on a quiz page
@@ -109,12 +172,39 @@ You need an API key from one of the following providers:
 - Wait a few seconds and try again
 - Consider upgrading your API plan
 
+### Grades automation stops
+- Check if you're still logged in to Coursera
+- Some assignment types require manual completion
+- Re-start automation from the Grades Auto tab
+
+### Written assignment upload fails
+- The file will be downloaded automatically
+- Upload the downloaded file manually
+- Check if the assignment requires a specific file format
+
 ## Privacy & Security
 
 - Your API key is stored locally in Chrome's secure storage
-- Questions are sent to OpenAI/Google for processing
+- Questions and assignment content are sent to OpenAI/Google for processing
 - No data is stored on external servers
 - No tracking or analytics
+- Generated documents are created locally
+
+## Technical Details
+
+### Files
+- `manifest.json` - Chrome extension configuration
+- `background.js` - Service worker for API calls
+- `content.js` - Quiz solving logic
+- `grades-automation.js` - Grades automation module
+- `popup.html/js` - Extension popup UI
+- `styles.css` - Visual styling
+
+### Permissions
+- `storage` - Store settings and API keys
+- `activeTab` - Access current tab
+- `scripting` - Run scripts on Coursera pages
+- `downloads` - Download generated documents
 
 ## Disclaimer
 
@@ -123,3 +213,19 @@ This extension is for personal educational use only. Use responsibly and in acco
 ## License
 
 MIT License - Free for personal use.
+
+## Changelog
+
+### v2.0.0
+- Added Grades Automation feature
+- Support for written assignments and discussions
+- Automatic document generation and upload
+- Specialization course navigation
+- Progress tracking dashboard
+- New tabbed popup interface
+
+### v1.0.0
+- Initial release
+- Quiz solving with OpenAI and Gemini
+- Keyboard shortcuts
+- Confidence badges
