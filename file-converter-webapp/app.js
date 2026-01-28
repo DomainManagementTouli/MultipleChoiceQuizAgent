@@ -4,6 +4,503 @@
  */
 
 // ============================================
+// Pure JavaScript GIF Encoder (No Web Workers)
+// ============================================
+
+class GifEncoder {
+    constructor(width, height) {
+        this.width = width;
+        this.height = height;
+        this.frames = [];
+        this.delay = 100;
+        this.repeat = 0; // 0 = loop forever, -1 = no loop
+    }
+
+    setDelay(ms) {
+        this.delay = ms;
+    }
+
+    setRepeat(count) {
+        this.repeat = count;
+    }
+
+    addFrame(canvas, delay = null) {
+        const ctx = canvas.getContext('2d');
+        const imageData = ctx.getImageData(0, 0, this.width, this.height);
+        this.frames.push({
+            data: imageData.data,
+            delay: delay || this.delay
+        });
+    }
+
+    render() {
+        const stream = new ByteArray();
+
+        // GIF Header
+        stream.writeUTFBytes('GIF89a');
+
+        // Logical Screen Descriptor
+        stream.writeShort(this.width);
+        stream.writeShort(this.height);
+        stream.writeByte(0xF7); // Global Color Table Flag = 1, Color Resolution = 7, Sort Flag = 0, Size = 7
+        stream.writeByte(0);    // Background Color Index
+        stream.writeByte(0);    // Pixel Aspect Ratio
+
+        // Global Color Table (256 colors)
+        for (let i = 0; i < 256; i++) {
+            stream.writeByte(i);
+            stream.writeByte(i);
+            stream.writeByte(i);
+        }
+
+        // Netscape Extension for looping
+        if (this.repeat >= 0) {
+            stream.writeByte(0x21); // Extension Introducer
+            stream.writeByte(0xFF); // Application Extension
+            stream.writeByte(11);   // Block Size
+            stream.writeUTFBytes('NETSCAPE2.0');
+            stream.writeByte(3);    // Sub-block Size
+            stream.writeByte(1);    // Sub-block ID
+            stream.writeShort(this.repeat === 0 ? 0 : this.repeat);
+            stream.writeByte(0);    // Block Terminator
+        }
+
+        // Write each frame
+        for (const frame of this.frames) {
+            this.writeGraphicControlExtension(stream, frame.delay);
+            this.writeImageDescriptor(stream);
+            this.writeImageData(stream, frame.data);
+        }
+
+        // GIF Trailer
+        stream.writeByte(0x3B);
+
+        return new Blob([stream.getData()], { type: 'image/gif' });
+    }
+
+    writeGraphicControlExtension(stream, delay) {
+        stream.writeByte(0x21); // Extension Introducer
+        stream.writeByte(0xF9); // Graphic Control Label
+        stream.writeByte(4);    // Block Size
+        stream.writeByte(0);    // Packed byte (no transparency)
+        stream.writeShort(Math.round(delay / 10)); // Delay in centiseconds
+        stream.writeByte(0);    // Transparent Color Index
+        stream.writeByte(0);    // Block Terminator
+    }
+
+    writeImageDescriptor(stream) {
+        stream.writeByte(0x2C); // Image Separator
+        stream.writeShort(0);   // Left Position
+        stream.writeShort(0);   // Top Position
+        stream.writeShort(this.width);
+        stream.writeShort(this.height);
+        stream.writeByte(0);    // Packed byte (no local color table)
+    }
+
+    writeImageData(stream, pixels) {
+        const colorDepth = 8;
+        stream.writeByte(colorDepth); // LZW Minimum Code Size
+
+        // Convert RGBA to indexed color (grayscale for simplicity, or use color quantization)
+        const indexed = this.quantizeImage(pixels);
+
+        // LZW encode
+        const lzwData = this.lzwEncode(indexed, colorDepth);
+
+        // Write sub-blocks
+        let offset = 0;
+        while (offset < lzwData.length) {
+            const chunkSize = Math.min(255, lzwData.length - offset);
+            stream.writeByte(chunkSize);
+            for (let i = 0; i < chunkSize; i++) {
+                stream.writeByte(lzwData[offset + i]);
+            }
+            offset += chunkSize;
+        }
+
+        stream.writeByte(0); // Block Terminator
+    }
+
+    quantizeImage(pixels) {
+        const indexed = new Uint8Array(this.width * this.height);
+        for (let i = 0; i < indexed.length; i++) {
+            const r = pixels[i * 4];
+            const g = pixels[i * 4 + 1];
+            const b = pixels[i * 4 + 2];
+            // Convert to grayscale index (0-255)
+            indexed[i] = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+        }
+        return indexed;
+    }
+
+    lzwEncode(data, minCodeSize) {
+        const clearCode = 1 << minCodeSize;
+        const eoiCode = clearCode + 1;
+
+        let codeSize = minCodeSize + 1;
+        let nextCode = eoiCode + 1;
+        const maxCode = 4096;
+
+        const dictionary = new Map();
+        for (let i = 0; i < clearCode; i++) {
+            dictionary.set(String.fromCharCode(i), i);
+        }
+
+        const output = [];
+        let buffer = 0;
+        let bufferLength = 0;
+
+        const writeCode = (code) => {
+            buffer |= code << bufferLength;
+            bufferLength += codeSize;
+            while (bufferLength >= 8) {
+                output.push(buffer & 0xFF);
+                buffer >>= 8;
+                bufferLength -= 8;
+            }
+        };
+
+        writeCode(clearCode);
+
+        if (data.length === 0) {
+            writeCode(eoiCode);
+            if (bufferLength > 0) {
+                output.push(buffer & 0xFF);
+            }
+            return output;
+        }
+
+        let current = String.fromCharCode(data[0]);
+
+        for (let i = 1; i < data.length; i++) {
+            const char = String.fromCharCode(data[i]);
+            const combined = current + char;
+
+            if (dictionary.has(combined)) {
+                current = combined;
+            } else {
+                writeCode(dictionary.get(current));
+
+                if (nextCode < maxCode) {
+                    dictionary.set(combined, nextCode++);
+                    if (nextCode > (1 << codeSize) && codeSize < 12) {
+                        codeSize++;
+                    }
+                } else {
+                    writeCode(clearCode);
+                    dictionary.clear();
+                    for (let j = 0; j < clearCode; j++) {
+                        dictionary.set(String.fromCharCode(j), j);
+                    }
+                    nextCode = eoiCode + 1;
+                    codeSize = minCodeSize + 1;
+                }
+
+                current = char;
+            }
+        }
+
+        writeCode(dictionary.get(current));
+        writeCode(eoiCode);
+
+        if (bufferLength > 0) {
+            output.push(buffer & 0xFF);
+        }
+
+        return output;
+    }
+}
+
+class ByteArray {
+    constructor() {
+        this.data = [];
+    }
+
+    writeByte(value) {
+        this.data.push(value & 0xFF);
+    }
+
+    writeShort(value) {
+        this.data.push(value & 0xFF);
+        this.data.push((value >> 8) & 0xFF);
+    }
+
+    writeUTFBytes(string) {
+        for (let i = 0; i < string.length; i++) {
+            this.data.push(string.charCodeAt(i));
+        }
+    }
+
+    getData() {
+        return new Uint8Array(this.data);
+    }
+}
+
+// ============================================
+// Advanced GIF Encoder with Color Quantization
+// ============================================
+
+class AdvancedGifEncoder {
+    constructor(width, height, quality = 10) {
+        this.width = width;
+        this.height = height;
+        this.quality = quality;
+        this.frames = [];
+        this.delay = 100;
+        this.repeat = 0;
+    }
+
+    setDelay(ms) {
+        this.delay = ms;
+    }
+
+    setRepeat(count) {
+        this.repeat = count;
+    }
+
+    addFrame(canvas, delay = null) {
+        const ctx = canvas.getContext('2d');
+        const imageData = ctx.getImageData(0, 0, this.width, this.height);
+        this.frames.push({
+            data: imageData.data,
+            delay: delay || this.delay
+        });
+    }
+
+    render(onProgress) {
+        const stream = new ByteArray();
+
+        // Build color palette from first frame
+        const palette = this.buildPalette(this.frames[0].data);
+
+        // GIF Header
+        stream.writeUTFBytes('GIF89a');
+
+        // Logical Screen Descriptor
+        stream.writeShort(this.width);
+        stream.writeShort(this.height);
+        stream.writeByte(0xF7); // Global Color Table
+        stream.writeByte(0);
+        stream.writeByte(0);
+
+        // Global Color Table
+        for (let i = 0; i < 256; i++) {
+            if (palette[i]) {
+                stream.writeByte(palette[i][0]);
+                stream.writeByte(palette[i][1]);
+                stream.writeByte(palette[i][2]);
+            } else {
+                stream.writeByte(0);
+                stream.writeByte(0);
+                stream.writeByte(0);
+            }
+        }
+
+        // Netscape Extension
+        if (this.repeat >= 0) {
+            stream.writeByte(0x21);
+            stream.writeByte(0xFF);
+            stream.writeByte(11);
+            stream.writeUTFBytes('NETSCAPE2.0');
+            stream.writeByte(3);
+            stream.writeByte(1);
+            stream.writeShort(this.repeat === 0 ? 0 : this.repeat);
+            stream.writeByte(0);
+        }
+
+        // Write frames
+        const totalFrames = this.frames.length;
+        for (let i = 0; i < totalFrames; i++) {
+            const frame = this.frames[i];
+            this.writeGraphicControlExtension(stream, frame.delay);
+            this.writeImageDescriptor(stream);
+            this.writeImageData(stream, frame.data, palette);
+
+            if (onProgress) {
+                onProgress(Math.round(((i + 1) / totalFrames) * 100));
+            }
+        }
+
+        stream.writeByte(0x3B);
+
+        return new Blob([stream.getData()], { type: 'image/gif' });
+    }
+
+    buildPalette(pixels) {
+        // Simple median cut color quantization
+        const colorCounts = new Map();
+
+        for (let i = 0; i < pixels.length; i += 4) {
+            const r = pixels[i] >> 4 << 4;
+            const g = pixels[i + 1] >> 4 << 4;
+            const b = pixels[i + 2] >> 4 << 4;
+            const key = (r << 16) | (g << 8) | b;
+            colorCounts.set(key, (colorCounts.get(key) || 0) + 1);
+        }
+
+        // Sort by frequency and take top 256
+        const sorted = [...colorCounts.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 256);
+
+        const palette = [];
+        for (const [color] of sorted) {
+            palette.push([
+                (color >> 16) & 0xFF,
+                (color >> 8) & 0xFF,
+                color & 0xFF
+            ]);
+        }
+
+        // Fill remaining with grayscale
+        while (palette.length < 256) {
+            const gray = Math.round((palette.length / 256) * 255);
+            palette.push([gray, gray, gray]);
+        }
+
+        return palette;
+    }
+
+    findClosestColor(r, g, b, palette) {
+        let minDist = Infinity;
+        let index = 0;
+
+        for (let i = 0; i < palette.length; i++) {
+            const pr = palette[i][0];
+            const pg = palette[i][1];
+            const pb = palette[i][2];
+            const dist = (r - pr) ** 2 + (g - pg) ** 2 + (b - pb) ** 2;
+            if (dist < minDist) {
+                minDist = dist;
+                index = i;
+            }
+        }
+
+        return index;
+    }
+
+    writeGraphicControlExtension(stream, delay) {
+        stream.writeByte(0x21);
+        stream.writeByte(0xF9);
+        stream.writeByte(4);
+        stream.writeByte(0);
+        stream.writeShort(Math.round(delay / 10));
+        stream.writeByte(0);
+        stream.writeByte(0);
+    }
+
+    writeImageDescriptor(stream) {
+        stream.writeByte(0x2C);
+        stream.writeShort(0);
+        stream.writeShort(0);
+        stream.writeShort(this.width);
+        stream.writeShort(this.height);
+        stream.writeByte(0);
+    }
+
+    writeImageData(stream, pixels, palette) {
+        const indexed = new Uint8Array(this.width * this.height);
+
+        for (let i = 0; i < indexed.length; i++) {
+            const r = pixels[i * 4];
+            const g = pixels[i * 4 + 1];
+            const b = pixels[i * 4 + 2];
+            indexed[i] = this.findClosestColor(r, g, b, palette);
+        }
+
+        const colorDepth = 8;
+        stream.writeByte(colorDepth);
+
+        const lzwData = this.lzwEncode(indexed, colorDepth);
+
+        let offset = 0;
+        while (offset < lzwData.length) {
+            const chunkSize = Math.min(255, lzwData.length - offset);
+            stream.writeByte(chunkSize);
+            for (let i = 0; i < chunkSize; i++) {
+                stream.writeByte(lzwData[offset + i]);
+            }
+            offset += chunkSize;
+        }
+
+        stream.writeByte(0);
+    }
+
+    lzwEncode(data, minCodeSize) {
+        const clearCode = 1 << minCodeSize;
+        const eoiCode = clearCode + 1;
+
+        let codeSize = minCodeSize + 1;
+        let nextCode = eoiCode + 1;
+        const maxCode = 4096;
+
+        const dictionary = new Map();
+        for (let i = 0; i < clearCode; i++) {
+            dictionary.set(String.fromCharCode(i), i);
+        }
+
+        const output = [];
+        let buffer = 0;
+        let bufferLength = 0;
+
+        const writeCode = (code) => {
+            buffer |= code << bufferLength;
+            bufferLength += codeSize;
+            while (bufferLength >= 8) {
+                output.push(buffer & 0xFF);
+                buffer >>= 8;
+                bufferLength -= 8;
+            }
+        };
+
+        writeCode(clearCode);
+
+        if (data.length === 0) {
+            writeCode(eoiCode);
+            if (bufferLength > 0) output.push(buffer & 0xFF);
+            return output;
+        }
+
+        let current = String.fromCharCode(data[0]);
+
+        for (let i = 1; i < data.length; i++) {
+            const char = String.fromCharCode(data[i]);
+            const combined = current + char;
+
+            if (dictionary.has(combined)) {
+                current = combined;
+            } else {
+                writeCode(dictionary.get(current));
+
+                if (nextCode < maxCode) {
+                    dictionary.set(combined, nextCode++);
+                    if (nextCode > (1 << codeSize) && codeSize < 12) {
+                        codeSize++;
+                    }
+                } else {
+                    writeCode(clearCode);
+                    dictionary.clear();
+                    for (let j = 0; j < clearCode; j++) {
+                        dictionary.set(String.fromCharCode(j), j);
+                    }
+                    nextCode = eoiCode + 1;
+                    codeSize = minCodeSize + 1;
+                }
+
+                current = char;
+            }
+        }
+
+        writeCode(dictionary.get(current));
+        writeCode(eoiCode);
+
+        if (bufferLength > 0) output.push(buffer & 0xFF);
+
+        return output;
+    }
+}
+
+// ============================================
 // Global State & Utilities
 // ============================================
 
@@ -1310,14 +1807,10 @@ async function createGif(files, options, onProgress) {
     const aspectRatio = firstImg.height / firstImg.width;
     const height = Math.round(width * aspectRatio);
 
-    // Create GIF using gif.js
-    const gif = new GIF({
-        workers: 2,
-        quality: 10,
-        width: width,
-        height: height,
-        workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
-    });
+    // Create GIF using our custom encoder (no web workers needed)
+    const gif = new AdvancedGifEncoder(width, height);
+    gif.setDelay(delay);
+    gif.setRepeat(loop ? 0 : -1);
 
     // Create canvas for processing
     const canvas = document.createElement('canvas');
@@ -1343,29 +1836,20 @@ async function createGif(files, options, onProgress) {
         const y = (height - scaledHeight) / 2;
 
         ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
-        gif.addFrame(ctx, { copy: true, delay: delay });
+        gif.addFrame(canvas, delay);
         onProgress(20 + Math.round((index / framesToAdd.length) * 50));
     });
 
-    // Set loop
-    if (!loop) {
-        gif.setOption('repeat', -1);
-    }
+    onProgress(70);
 
     // Render GIF
-    return new Promise((resolve, reject) => {
-        gif.on('finished', (blob) => {
-            state.gif.gifBlob = blob;
-            onProgress(100);
-            resolve(blob);
-        });
-
-        gif.on('progress', (p) => {
-            onProgress(70 + Math.round(p * 30));
-        });
-
-        gif.render();
+    const blob = gif.render((progress) => {
+        onProgress(70 + Math.round(progress * 0.3));
     });
+
+    state.gif.gifBlob = blob;
+    onProgress(100);
+    return blob;
 }
 
 function loadImage(file) {
