@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal File Converter & Media Tools</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 18V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9 15L12 12L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <h1>FileForge</h1>
+            </div>
+            <p class="tagline">Universal File Converter & Media Tools</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="documents">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14,2 14,8 20,8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10,9 9,9 8,9"/>
+                </svg>
+                Documents
+            </button>
+            <button class="tab-btn" data-tab="audio">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18V5l12-2v13"/>
+                    <circle cx="6" cy="18" r="3"/>
+                    <circle cx="18" cy="16" r="3"/>
+                </svg>
+                Audio
+            </button>
+            <button class="tab-btn" data-tab="data">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                </svg>
+                Data Files
+            </button>
+            <button class="tab-btn" data-tab="gif">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21,15 16,10 5,21"/>
+                </svg>
+                GIF Creator
+            </button>
+            <button class="tab-btn" data-tab="collage">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                Photo Collage
+            </button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Documents Tab -->
+            <section id="documents" class="tab-content active">
+                <div class="tool-header">
+                    <h2>Document Converter</h2>
+                    <p>Convert between PDF, DOCX, TXT, HTML, RTF, and more</p>
+                </div>
+
+                <div class="converter-container">
+                    <div class="upload-zone" id="doc-upload-zone">
+                        <input type="file" id="doc-input" accept=".pdf,.doc,.docx,.txt,.rtf,.html,.htm,.odt,.md" hidden>
+                        <div class="upload-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                        </div>
+                        <p class="upload-text">Drag & drop your document here</p>
+                        <p class="upload-subtext">or click to browse</p>
+                        <p class="file-types">Supports: PDF, DOCX, TXT, HTML, RTF, ODT, Markdown</p>
+                    </div>
+
+                    <div class="file-info" id="doc-file-info" style="display: none;">
+                        <div class="file-preview">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                            </svg>
+                            <span id="doc-file-name">document.pdf</span>
+                            <span id="doc-file-size">(2.4 MB)</span>
+                        </div>
+                        <button class="remove-file" id="doc-remove">Remove</button>
+                    </div>
+
+                    <div class="conversion-options">
+                        <label for="doc-output-format">Convert to:</label>
+                        <select id="doc-output-format">
+                            <option value="pdf">PDF</option>
+                            <option value="txt">Plain Text (TXT)</option>
+                            <option value="html">HTML</option>
+                            <option value="md">Markdown</option>
+                            <option value="docx">Word Document (DOCX)</option>
+                            <option value="rtf">Rich Text Format (RTF)</option>
+                        </select>
+                    </div>
+
+                    <button class="convert-btn" id="doc-convert-btn" disabled>
+                        <span>Convert Document</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+
+                    <div class="progress-container" id="doc-progress" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="doc-progress-fill"></div>
+                        </div>
+                        <span class="progress-text" id="doc-progress-text">Converting...</span>
+                    </div>
+
+                    <div class="download-container" id="doc-download" style="display: none;">
+                        <button class="download-btn" id="doc-download-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download Converted File
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Audio Tab -->
+            <section id="audio" class="tab-content">
+                <div class="tool-header">
+                    <h2>Audio Converter</h2>
+                    <p>Convert between MP3, WAV, OGG, AAC, FLAC, and more</p>
+                </div>
+
+                <div class="converter-container">
+                    <div class="upload-zone" id="audio-upload-zone">
+                        <input type="file" id="audio-input" accept="audio/*,.mp3,.wav,.ogg,.aac,.flac,.m4a,.wma,.aiff" hidden>
+                        <div class="upload-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18V5l12-2v13"/>
+                                <circle cx="6" cy="18" r="3"/>
+                                <circle cx="18" cy="16" r="3"/>
+                            </svg>
+                        </div>
+                        <p class="upload-text">Drag & drop your audio file here</p>
+                        <p class="upload-subtext">or click to browse</p>
+                        <p class="file-types">Supports: MP3, WAV, OGG, AAC, FLAC, M4A, WMA, AIFF</p>
+                    </div>
+
+                    <div class="file-info" id="audio-file-info" style="display: none;">
+                        <div class="file-preview">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18V5l12-2v13"/>
+                                <circle cx="6" cy="18" r="3"/>
+                                <circle cx="18" cy="16" r="3"/>
+                            </svg>
+                            <span id="audio-file-name">audio.mp3</span>
+                            <span id="audio-file-size">(5.2 MB)</span>
+                        </div>
+                        <audio id="audio-preview" controls style="width: 100%; margin-top: 10px;"></audio>
+                        <button class="remove-file" id="audio-remove">Remove</button>
+                    </div>
+
+                    <div class="conversion-options">
+                        <div class="option-group">
+                            <label for="audio-output-format">Convert to:</label>
+                            <select id="audio-output-format">
+                                <option value="mp3">MP3</option>
+                                <option value="wav">WAV</option>
+                                <option value="ogg">OGG</option>
+                                <option value="aac">AAC</option>
+                                <option value="flac">FLAC</option>
+                                <option value="webm">WebM Audio</option>
+                            </select>
+                        </div>
+
+                        <div class="option-group">
+                            <label for="audio-quality">Quality:</label>
+                            <select id="audio-quality">
+                                <option value="high">High (320 kbps)</option>
+                                <option value="medium" selected>Medium (192 kbps)</option>
+                                <option value="low">Low (128 kbps)</option>
+                            </select>
+                        </div>
+
+                        <div class="option-group">
+                            <label for="audio-samplerate">Sample Rate:</label>
+                            <select id="audio-samplerate">
+                                <option value="48000">48000 Hz</option>
+                                <option value="44100" selected>44100 Hz</option>
+                                <option value="22050">22050 Hz</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="convert-btn" id="audio-convert-btn" disabled>
+                        <span>Convert Audio</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+
+                    <div class="progress-container" id="audio-progress" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="audio-progress-fill"></div>
+                        </div>
+                        <span class="progress-text" id="audio-progress-text">Converting...</span>
+                    </div>
+
+                    <div class="download-container" id="audio-download" style="display: none;">
+                        <button class="download-btn" id="audio-download-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download Converted Audio
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Files Tab -->
+            <section id="data" class="tab-content">
+                <div class="tool-header">
+                    <h2>Data File Converter</h2>
+                    <p>Convert between JSON, CSV, XML, YAML, and more</p>
+                </div>
+
+                <div class="converter-container">
+                    <div class="upload-zone" id="data-upload-zone">
+                        <input type="file" id="data-input" accept=".json,.csv,.xml,.yaml,.yml,.tsv,.xlsx,.xls" hidden>
+                        <div class="upload-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                            </svg>
+                        </div>
+                        <p class="upload-text">Drag & drop your data file here</p>
+                        <p class="upload-subtext">or click to browse</p>
+                        <p class="file-types">Supports: JSON, CSV, XML, YAML, TSV, Excel</p>
+                    </div>
+
+                    <div class="file-info" id="data-file-info" style="display: none;">
+                        <div class="file-preview">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                            </svg>
+                            <span id="data-file-name">data.json</span>
+                            <span id="data-file-size">(125 KB)</span>
+                        </div>
+                        <button class="remove-file" id="data-remove">Remove</button>
+                    </div>
+
+                    <div class="data-preview-container" id="data-preview-container" style="display: none;">
+                        <label>Data Preview:</label>
+                        <pre id="data-preview" class="data-preview"></pre>
+                    </div>
+
+                    <div class="conversion-options">
+                        <div class="option-group">
+                            <label for="data-output-format">Convert to:</label>
+                            <select id="data-output-format">
+                                <option value="json">JSON</option>
+                                <option value="csv">CSV</option>
+                                <option value="xml">XML</option>
+                                <option value="yaml">YAML</option>
+                                <option value="tsv">TSV (Tab Separated)</option>
+                            </select>
+                        </div>
+
+                        <div class="option-group">
+                            <label>
+                                <input type="checkbox" id="data-pretty-print" checked>
+                                Pretty print output
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="convert-btn" id="data-convert-btn" disabled>
+                        <span>Convert Data</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+
+                    <div class="progress-container" id="data-progress" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="data-progress-fill"></div>
+                        </div>
+                        <span class="progress-text" id="data-progress-text">Converting...</span>
+                    </div>
+
+                    <div class="download-container" id="data-download" style="display: none;">
+                        <button class="download-btn" id="data-download-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download Converted Data
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GIF Creator Tab -->
+            <section id="gif" class="tab-content">
+                <div class="tool-header">
+                    <h2>GIF Creator</h2>
+                    <p>Combine multiple images into an animated GIF</p>
+                </div>
+
+                <div class="converter-container">
+                    <div class="upload-zone" id="gif-upload-zone">
+                        <input type="file" id="gif-input" accept="image/*" multiple hidden>
+                        <div class="upload-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21,15 16,10 5,21"/>
+                            </svg>
+                        </div>
+                        <p class="upload-text">Drag & drop your images here</p>
+                        <p class="upload-subtext">or click to browse (select multiple)</p>
+                        <p class="file-types">Supports: PNG, JPG, JPEG, WebP, BMP</p>
+                    </div>
+
+                    <div class="gif-images-container" id="gif-images-container" style="display: none;">
+                        <label>Images (<span id="gif-image-count">0</span> selected) - Drag to reorder:</label>
+                        <div class="gif-images-grid" id="gif-images-grid"></div>
+                        <button class="add-more-btn" id="gif-add-more">+ Add More Images</button>
+                    </div>
+
+                    <div class="conversion-options" id="gif-options" style="display: none;">
+                        <div class="option-group">
+                            <label for="gif-delay">Frame Delay (ms):</label>
+                            <input type="range" id="gif-delay" min="50" max="2000" value="500" step="50">
+                            <span id="gif-delay-value">500ms</span>
+                        </div>
+
+                        <div class="option-group">
+                            <label for="gif-width">Output Width:</label>
+                            <input type="number" id="gif-width" value="480" min="100" max="1920" step="10">
+                            <span>px</span>
+                        </div>
+
+                        <div class="option-group">
+                            <label>
+                                <input type="checkbox" id="gif-loop" checked>
+                                Loop animation
+                            </label>
+                        </div>
+
+                        <div class="option-group">
+                            <label>
+                                <input type="checkbox" id="gif-reverse">
+                                Add reverse (boomerang effect)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="gif-preview-container" id="gif-preview-container" style="display: none;">
+                        <label>Preview:</label>
+                        <div class="gif-preview">
+                            <img id="gif-preview" alt="GIF Preview">
+                        </div>
+                    </div>
+
+                    <button class="convert-btn" id="gif-create-btn" disabled>
+                        <span>Create GIF</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+
+                    <div class="progress-container" id="gif-progress" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="gif-progress-fill"></div>
+                        </div>
+                        <span class="progress-text" id="gif-progress-text">Creating GIF...</span>
+                    </div>
+
+                    <div class="download-container" id="gif-download" style="display: none;">
+                        <button class="download-btn" id="gif-download-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download GIF
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Photo Collage Tab -->
+            <section id="collage" class="tab-content">
+                <div class="tool-header">
+                    <h2>Photo Collage Maker</h2>
+                    <p>Create beautiful collages with up to 6 photos</p>
+                </div>
+
+                <div class="converter-container collage-container">
+                    <div class="upload-zone" id="collage-upload-zone">
+                        <input type="file" id="collage-input" accept="image/*" multiple hidden>
+                        <div class="upload-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"/>
+                                <rect x="14" y="3" width="7" height="7"/>
+                                <rect x="14" y="14" width="7" height="7"/>
+                                <rect x="3" y="14" width="7" height="7"/>
+                            </svg>
+                        </div>
+                        <p class="upload-text">Drag & drop your photos here</p>
+                        <p class="upload-subtext">or click to browse (up to 6 photos)</p>
+                        <p class="file-types">Supports: PNG, JPG, JPEG, WebP</p>
+                    </div>
+
+                    <div class="collage-images-container" id="collage-images-container" style="display: none;">
+                        <label>Photos (<span id="collage-image-count">0</span>/6 selected):</label>
+                        <div class="collage-images-grid" id="collage-images-grid"></div>
+                        <button class="add-more-btn" id="collage-add-more">+ Add More Photos</button>
+                    </div>
+
+                    <div class="collage-options" id="collage-options" style="display: none;">
+                        <div class="option-section">
+                            <h3>Layout</h3>
+                            <div class="layout-options" id="layout-options">
+                                <!-- Layouts will be generated dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="option-section">
+                            <h3>Border</h3>
+                            <div class="option-group">
+                                <label for="border-width">Border Width:</label>
+                                <input type="range" id="border-width" min="0" max="30" value="10" step="1">
+                                <span id="border-width-value">10px</span>
+                            </div>
+                            <div class="option-group">
+                                <label for="border-color">Border Color:</label>
+                                <input type="color" id="border-color" value="#ffffff">
+                            </div>
+                            <div class="option-group">
+                                <label for="border-radius">Corner Radius:</label>
+                                <input type="range" id="border-radius" min="0" max="30" value="0" step="1">
+                                <span id="border-radius-value">0px</span>
+                            </div>
+                        </div>
+
+                        <div class="option-section">
+                            <h3>Labels</h3>
+                            <div class="option-group">
+                                <label>
+                                    <input type="checkbox" id="show-labels">
+                                    Show labels under photos
+                                </label>
+                            </div>
+                            <div class="labels-container" id="labels-container" style="display: none;">
+                                <!-- Labels will be generated dynamically -->
+                            </div>
+                            <div class="option-group" id="label-style-options" style="display: none;">
+                                <label for="label-font-size">Font Size:</label>
+                                <input type="range" id="label-font-size" min="10" max="36" value="16" step="1">
+                                <span id="label-font-size-value">16px</span>
+                            </div>
+                            <div class="option-group" id="label-color-option" style="display: none;">
+                                <label for="label-color">Text Color:</label>
+                                <input type="color" id="label-color" value="#333333">
+                            </div>
+                        </div>
+
+                        <div class="option-section">
+                            <h3>Output Size</h3>
+                            <div class="option-group">
+                                <label for="collage-width">Width:</label>
+                                <input type="number" id="collage-width" value="1200" min="400" max="4000" step="100">
+                                <span>px</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="collage-preview-section" id="collage-preview-section" style="display: none;">
+                        <label>Preview:</label>
+                        <div class="collage-preview-wrapper">
+                            <canvas id="collage-canvas"></canvas>
+                        </div>
+                    </div>
+
+                    <button class="convert-btn" id="collage-create-btn" disabled>
+                        <span>Create Collage</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+
+                    <div class="download-container" id="collage-download" style="display: none;">
+                        <button class="download-btn" id="collage-download-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download Collage
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>FileForge - All conversions happen in your browser. Your files never leave your device.</p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-message" id="toast-message"></span>
+    </div>
+
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+
+    <!-- App Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
