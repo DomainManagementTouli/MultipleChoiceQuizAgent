@@ -113,6 +113,7 @@
   top: 20px !important;
   right: 20px !important;
   padding: 14px 24px !important;
+  padding-right: 40px !important;
   border-radius: 8px !important;
   font-size: 14px !important;
   font-weight: 500 !important;
@@ -121,6 +122,28 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
   animation: cqa-slideIn 0.3s ease !important;
   max-width: 400px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.cqa-notification-close {
+  position: absolute !important;
+  top: 50% !important;
+  right: 10px !important;
+  transform: translateY(-50%) !important;
+  background: none !important;
+  border: none !important;
+  color: inherit !important;
+  font-size: 20px !important;
+  cursor: pointer !important;
+  opacity: 0.7 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+.cqa-notification-close:hover {
+  opacity: 1 !important;
 }
 
 @keyframes cqa-slideIn {
@@ -205,4 +228,109 @@
 .cqa-highlight {
   position: relative !important;
   display: block !important;
+}
+
+/* Automation Progress Overlay */
+.cqa-automation-overlay {
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 20px !important;
+  background: linear-gradient(135deg, #1a1a2e, #16213e) !important;
+  border: 1px solid #00d4ff33 !important;
+  border-radius: 12px !important;
+  padding: 16px 20px !important;
+  z-index: 999998 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  min-width: 280px !important;
+  animation: cqa-fadeIn 0.3s ease !important;
+}
+
+.cqa-automation-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 12px !important;
+}
+
+.cqa-automation-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #00d4ff !important;
+}
+
+.cqa-automation-dot {
+  width: 8px !important;
+  height: 8px !important;
+  background: #00ff88 !important;
+  border-radius: 50% !important;
+  animation: cqa-blink 1s infinite !important;
+}
+
+@keyframes cqa-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.cqa-automation-progress {
+  background: #ffffff10 !important;
+  border-radius: 4px !important;
+  height: 6px !important;
+  margin-bottom: 10px !important;
+  overflow: hidden !important;
+}
+
+.cqa-automation-progress-bar {
+  height: 100% !important;
+  background: linear-gradient(90deg, #00d4ff, #00ff88) !important;
+  border-radius: 4px !important;
+  transition: width 0.5s ease !important;
+}
+
+.cqa-automation-status {
+  font-size: 12px !important;
+  color: #aaa !important;
+}
+
+.cqa-automation-status strong {
+  color: #fff !important;
+}
+
+.cqa-automation-stats {
+  display: flex !important;
+  gap: 16px !important;
+  margin-top: 8px !important;
+  padding-top: 8px !important;
+  border-top: 1px solid #ffffff10 !important;
+}
+
+.cqa-automation-stat {
+  text-align: center !important;
+}
+
+.cqa-automation-stat-value {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #00d4ff !important;
+}
+
+.cqa-automation-stat-label {
+  font-size: 10px !important;
+  color: #666 !important;
+  text-transform: uppercase !important;
+}
+
+/* Loading spinner */
+.cqa-spinner {
+  display: inline-block !important;
+  width: 16px !important;
+  height: 16px !important;
+  border: 2px solid #00d4ff33 !important;
+  border-top-color: #00d4ff !important;
+  border-radius: 50% !important;
+  animation: cqa-spin 0.8s linear infinite !important;
+  margin-right: 8px !important;
 }

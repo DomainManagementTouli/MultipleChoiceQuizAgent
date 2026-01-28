@@ -11,11 +11,13 @@
     }
 
     body {
-      width: 360px;
+      width: 380px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #1a1a2e;
       color: #eee;
       padding: 16px;
+      max-height: 600px;
+      overflow-y: auto;
     }
 
     .header {
@@ -34,6 +36,42 @@
     .header p {
       font-size: 11px;
       color: #888;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #333;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: #888;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      color: #00d4ff;
+    }
+
+    .tab.active {
+      color: #00d4ff;
+      border-bottom-color: #00d4ff;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
     }
 
     .section {
@@ -86,10 +124,17 @@
       color: #ddd;
     }
 
+    .toggle-sublabel {
+      font-size: 11px;
+      color: #666;
+      margin-top: 2px;
+    }
+
     .toggle {
       position: relative;
       width: 44px;
       height: 24px;
+      flex-shrink: 0;
     }
 
     .toggle input {
@@ -161,6 +206,32 @@
       background: #444;
     }
 
+    .btn-danger {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #00ff88, #00cc66);
+      color: #000;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
     .status {
       text-align: center;
       padding: 8px;
@@ -182,6 +253,13 @@
       background: rgba(255, 68, 68, 0.15);
       color: #ff4444;
       border: 1px solid rgba(255, 68, 68, 0.3);
+    }
+
+    .status.info {
+      display: block;
+      background: rgba(0, 212, 255, 0.15);
+      color: #00d4ff;
+      border: 1px solid rgba(0, 212, 255, 0.3);
     }
 
     .shortcuts {
@@ -230,102 +308,320 @@
     .toggle-visibility:hover {
       color: #00d4ff;
     }
+
+    /* Grades Automation Specific Styles */
+    .automation-status {
+      background: #16213e;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .automation-status.running {
+      border: 1px solid #00d4ff;
+      animation: pulse-border 2s infinite;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { border-color: #00d4ff; }
+      50% { border-color: #0066ff; }
+    }
+
+    .status-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #666;
+    }
+
+    .status-dot.running {
+      background: #00ff88;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .status-dot.stopped {
+      background: #ff4444;
+    }
+
+    .status-label {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .stat-item {
+      background: #1a1a2e;
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #00d4ff;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: #666;
+      text-transform: uppercase;
+    }
+
+    .current-task {
+      margin-top: 12px;
+      padding: 8px;
+      background: #1a1a2e;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #aaa;
+    }
+
+    .current-task strong {
+      color: #00d4ff;
+    }
+
+    .info-box {
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 12px;
+      font-size: 11px;
+      color: #aaa;
+    }
+
+    .info-box strong {
+      color: #00d4ff;
+    }
+
+    .warning-box {
+      background: rgba(255, 200, 50, 0.1);
+      border: 1px solid rgba(255, 200, 50, 0.3);
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 12px;
+      font-size: 11px;
+      color: #ffc832;
+    }
   </style>
 </head>
 <body>
   <div class="header">
     <h1>Coursera Quiz Automation</h1>
-    <p>AI-Powered Quiz Solver</p>
+    <p>AI-Powered Quiz Solver & Grade Automation</p>
   </div>
 
-  <div class="section">
-    <div class="section-title">AI Provider</div>
-    <select id="aiProvider" class="model-select">
-      <option value="openai">OpenAI (GPT-4)</option>
-      <option value="gemini">Google Gemini</option>
-    </select>
+  <div class="tabs">
+    <div class="tab active" data-tab="quiz">Quiz Solver</div>
+    <div class="tab" data-tab="grades">Grades Auto</div>
+    <div class="tab" data-tab="settings">Settings</div>
+  </div>
 
-    <div id="openaiConfig">
-      <label for="openaiKey">OpenAI API Key</label>
-      <div class="api-key-container">
-        <input type="password" id="openaiKey" placeholder="sk-...">
-        <button class="toggle-visibility" data-target="openaiKey">Show</button>
+  <!-- Quiz Solver Tab -->
+  <div id="tab-quiz" class="tab-content active">
+    <div class="section">
+      <button id="solveBtn" class="btn btn-primary">Solve Current Quiz</button>
+      <button id="nextQuestionBtn" class="btn btn-secondary">Next Question</button>
+      <div id="quizStatus" class="status"></div>
+    </div>
+
+    <div class="shortcuts">
+      <div class="section-title">Keyboard Shortcuts</div>
+      <div class="shortcut-item">
+        <span>Solve Quiz</span>
+        <span class="shortcut-key">Alt + Z</span>
       </div>
-      <label for="openaiModel">Model</label>
-      <select id="openaiModel">
-        <option value="gpt-4o">GPT-4o (Recommended)</option>
-        <option value="gpt-4o-mini">GPT-4o Mini (Faster)</option>
-        <option value="gpt-4-turbo">GPT-4 Turbo</option>
-        <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Cheapest)</option>
-      </select>
-    </div>
-
-    <div id="geminiConfig" style="display: none;">
-      <label for="geminiKey">Google Gemini API Key</label>
-      <div class="api-key-container">
-        <input type="password" id="geminiKey" placeholder="AIza...">
-        <button class="toggle-visibility" data-target="geminiKey">Show</button>
+      <div class="shortcut-item">
+        <span>Next Question</span>
+        <span class="shortcut-key">Alt + N</span>
       </div>
-      <label for="geminiModel">Model</label>
-      <select id="geminiModel">
-        <option value="gemini-1.5-pro">Gemini 1.5 Pro (Recommended)</option>
-        <option value="gemini-1.5-flash">Gemini 1.5 Flash (Faster)</option>
-        <option value="gemini-pro">Gemini Pro</option>
+    </div>
+
+    <div class="info-box" style="margin-top: 12px;">
+      <strong>Tip:</strong> Navigate to a Coursera quiz page and click "Solve Current Quiz" or press Alt+Z to automatically answer questions.
+    </div>
+  </div>
+
+  <!-- Grades Automation Tab -->
+  <div id="tab-grades" class="tab-content">
+    <div class="automation-status" id="automationStatus">
+      <div class="status-header">
+        <div class="status-indicator">
+          <div class="status-dot" id="statusDot"></div>
+          <span class="status-label" id="statusLabel">Stopped</span>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value" id="statQuizzes">0</div>
+          <div class="stat-label">Quizzes</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statAssignments">0</div>
+          <div class="stat-label">Assignments</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statCourses">0</div>
+          <div class="stat-label">Courses</div>
+        </div>
+      </div>
+      <div class="current-task" id="currentTask" style="display: none;">
+        <strong>Current:</strong> <span id="currentTaskText"></span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Automation Options</div>
+
+      <div class="toggle-container">
+        <div>
+          <span class="toggle-label">Continue to next course</span>
+          <div class="toggle-sublabel">Auto-proceed through specialization</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="continueToNextCourse" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-container">
+        <div>
+          <span class="toggle-label">Redo completed assignments</span>
+          <div class="toggle-sublabel">Retry even if already passed</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="overrideComplete">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-container">
+        <div>
+          <span class="toggle-label">Auto-submit assignments</span>
+          <div class="toggle-sublabel">Automatically click submit</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="autoSubmit" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="section">
+      <button id="startAutomationBtn" class="btn btn-success">Start Grades Automation</button>
+      <button id="stopAutomationBtn" class="btn btn-danger" style="display: none;">Stop Automation</button>
+      <button id="viewGradesBtn" class="btn btn-secondary">Go to Grades Page</button>
+      <div id="gradesStatus" class="status"></div>
+    </div>
+
+    <div class="warning-box">
+      <strong>Note:</strong> This will automatically navigate through all graded assignments in your current course. Peer reviews and programming assignments require manual completion.
+    </div>
+  </div>
+
+  <!-- Settings Tab -->
+  <div id="tab-settings" class="tab-content">
+    <div class="section">
+      <div class="section-title">AI Provider</div>
+      <select id="aiProvider" class="model-select">
+        <option value="openai">OpenAI (GPT-4)</option>
+        <option value="gemini">Google Gemini</option>
       </select>
+
+      <div id="openaiConfig">
+        <label for="openaiKey">OpenAI API Key</label>
+        <div class="api-key-container">
+          <input type="password" id="openaiKey" placeholder="sk-...">
+          <button class="toggle-visibility" data-target="openaiKey">Show</button>
+        </div>
+        <label for="openaiModel">Model</label>
+        <select id="openaiModel">
+          <option value="gpt-4o">GPT-4o (Recommended)</option>
+          <option value="gpt-4o-mini">GPT-4o Mini (Faster)</option>
+          <option value="gpt-4-turbo">GPT-4 Turbo</option>
+          <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Cheapest)</option>
+        </select>
+      </div>
+
+      <div id="geminiConfig" style="display: none;">
+        <label for="geminiKey">Google Gemini API Key</label>
+        <div class="api-key-container">
+          <input type="password" id="geminiKey" placeholder="AIza...">
+          <button class="toggle-visibility" data-target="geminiKey">Show</button>
+        </div>
+        <label for="geminiModel">Model</label>
+        <select id="geminiModel">
+          <option value="gemini-1.5-pro">Gemini 1.5 Pro (Recommended)</option>
+          <option value="gemini-1.5-flash">Gemini 1.5 Flash (Faster)</option>
+          <option value="gemini-pro">Gemini Pro</option>
+        </select>
+      </div>
     </div>
-  </div>
 
-  <div class="section">
-    <div class="section-title">Settings</div>
+    <div class="section">
+      <div class="section-title">Quiz Settings</div>
 
-    <div class="toggle-container">
-      <span class="toggle-label">Auto-solve on page load</span>
-      <label class="toggle">
-        <input type="checkbox" id="autoSolve">
-        <span class="slider"></span>
-      </label>
+      <div class="toggle-container">
+        <span class="toggle-label">Auto-solve on page load</span>
+        <label class="toggle">
+          <input type="checkbox" id="autoSolve">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-container">
+        <span class="toggle-label">Auto-select answers</span>
+        <label class="toggle">
+          <input type="checkbox" id="autoSelect" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-container">
+        <span class="toggle-label">Show confidence scores</span>
+        <label class="toggle">
+          <input type="checkbox" id="showConfidence" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-container">
+        <span class="toggle-label">Highlight answers</span>
+        <label class="toggle">
+          <input type="checkbox" id="highlightAnswers" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
     </div>
 
-    <div class="toggle-container">
-      <span class="toggle-label">Auto-select answers</span>
-      <label class="toggle">
-        <input type="checkbox" id="autoSelect" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="toggle-container">
-      <span class="toggle-label">Show confidence scores</span>
-      <label class="toggle">
-        <input type="checkbox" id="showConfidence" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="toggle-container">
-      <span class="toggle-label">Highlight answers</span>
-      <label class="toggle">
-        <input type="checkbox" id="highlightAnswers" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-  </div>
-
-  <div class="section">
-    <button id="saveBtn" class="btn btn-primary">Save Settings</button>
-    <button id="solveBtn" class="btn btn-secondary">Solve Current Quiz</button>
-    <div id="status" class="status"></div>
-  </div>
-
-  <div class="shortcuts">
-    <div class="section-title">Keyboard Shortcuts</div>
-    <div class="shortcut-item">
-      <span>Solve Quiz</span>
-      <span class="shortcut-key">Alt + Z</span>
-    </div>
-    <div class="shortcut-item">
-      <span>Next Question</span>
-      <span class="shortcut-key">Alt + N</span>
+    <div class="section">
+      <button id="saveBtn" class="btn btn-primary">Save Settings</button>
+      <div id="settingsStatus" class="status"></div>
     </div>
   </div>
 

@@ -1,4 +1,4 @@
-// Background service worker for Coursera Quiz Automation
+// Background service worker for Coursera Quiz & Grades Automation
 
 // Handle keyboard commands
 chrome.commands.onCommand.addListener(async (command) => {
@@ -12,6 +12,8 @@ chrome.commands.onCommand.addListener(async (command) => {
     chrome.tabs.sendMessage(tab.id, { action: 'solveQuiz' });
   } else if (command === 'next-question') {
     chrome.tabs.sendMessage(tab.id, { action: 'nextQuestion' });
+  } else if (command === 'start-automation') {
+    chrome.tabs.sendMessage(tab.id, { action: 'startGradesAutomation' });
   }
 });
 
@@ -28,6 +30,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     handleGetAnswers(request.questions)
       .then(results => sendResponse(results))
       .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  if (request.action === 'generateText') {
+    handleGenerateText(request.prompt, request.maxTokens)
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ error: error.message }));
+    return true;
+  }
+
+  if (request.action === 'triggerQuizSolve') {
+    // Forward to content script on the sender's tab
+    if (sender.tab?.id) {
+      chrome.tabs.sendMessage(sender.tab.id, { action: 'solveQuiz' }, (response) => {
+        sendResponse(response);
+      });
+    }
     return true;
   }
 });
@@ -77,6 +96,105 @@ async function handleGetAnswers(questions) {
   }
 
   return results;
+}
+
+// Generate text for written assignments
+async function handleGenerateText(prompt, maxTokens = 2000) {
+  const settings = await chrome.storage.sync.get({
+    aiProvider: 'openai',
+    openaiKey: '',
+    openaiModel: 'gpt-4o',
+    geminiKey: '',
+    geminiModel: 'gemini-1.5-pro'
+  });
+
+  const provider = settings.aiProvider;
+  const apiKey = provider === 'openai' ? settings.openaiKey : settings.geminiKey;
+  const model = provider === 'openai' ? settings.openaiModel : settings.geminiModel;
+
+  if (!apiKey) {
+    throw new Error('API key not configured. Please set it in extension settings.');
+  }
+
+  if (provider === 'openai') {
+    return await generateTextOpenAI(apiKey, model, prompt, maxTokens);
+  } else {
+    return await generateTextGemini(apiKey, model, prompt, maxTokens);
+  }
+}
+
+// Generate text using OpenAI
+async function generateTextOpenAI(apiKey, model, prompt, maxTokens) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: model,
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a knowledgeable and diligent student completing coursework. Write clear, well-structured responses that demonstrate understanding of the subject matter. Be thorough but concise.'
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: maxTokens
+    })
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error?.message || `OpenAI API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const text = data.choices[0]?.message?.content || '';
+
+  return { text, tokens: data.usage?.total_tokens || 0 };
+}
+
+// Generate text using Gemini
+async function generateTextGemini(apiKey, model, prompt, maxTokens) {
+  const systemPrompt = 'You are a knowledgeable and diligent student completing coursework. Write clear, well-structured responses that demonstrate understanding of the subject matter. Be thorough but concise.';
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              { text: systemPrompt + '\n\n' + prompt }
+            ]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: maxTokens
+        }
+      })
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error?.message || `Gemini API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+  return { text, tokens: 0 }; // Gemini doesn't return token count in same way
 }
 
 // Call OpenAI API
